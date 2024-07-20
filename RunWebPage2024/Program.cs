@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using RunBot2024.DbContexts;
+
 namespace RunWebPage2024
 {
     public class Program
@@ -8,6 +11,16 @@ namespace RunWebPage2024
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            IConfiguration config;
+            config = builder.Configuration;
+
+            var connectionString = config.GetConnectionString("NpgConnection");
+
+            builder.Services.AddDbContext<NpgDbContext>(option =>
+            {
+                option.UseNpgsql(connectionString);
+            });
 
             var app = builder.Build();
 
