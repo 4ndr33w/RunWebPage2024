@@ -3,3 +3,21 @@
 *@
 @{
 }
+@model List<RivalModel>
+
+<tbody>
+    @{
+        int position = 0;
+        foreach (var rival in Model)
+        {
+            position++;
+            <tr>
+                <td id="@position" align="center">@position</td>
+                <td align="center">@rival.Name</td>
+                <td align="center">@rival.TotalResult</td>
+                <td align="center">@rival.Company</td>
+                <td align="center">@rival.Gender</td>
+            </tr>
+        }
+    }
+</tbody>

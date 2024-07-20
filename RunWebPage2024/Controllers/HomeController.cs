@@ -55,6 +55,22 @@ namespace RunWebPage2024.Controllers
             return View(compositeModel);
         }
 
+        [HttpPost]
+        public IActionResult OnCompanySelect(string gender)
+        {
+
+            if (gender != "all")
+            {
+                _rivalsFilteredCollection = new List<RivalModel> ( _rivalsFullCollection.Where(x => x.Gender == gender[0]).ToList() );
+            }
+            else
+            {
+                _rivalsFilteredCollection = _rivalsFullCollection;
+            }
+
+            return PartialView("_PersonalChallengePartialTable", _rivalsFilteredCollection);
+        }
+
         //public IActionResult Privacy()
         //{
         //    return View();

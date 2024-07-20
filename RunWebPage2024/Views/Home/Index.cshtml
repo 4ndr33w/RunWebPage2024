@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
 
-                <tbody>
+@*                 <tbody>
                         @{
                             int position = 0;
                             foreach(var rival in Model.Item1)
@@ -53,10 +53,10 @@
                                 </tr>
                             }
                         }
-                </tbody>
-@*                     @{
-                        await Html.RenderPartialAsync("_PersonalChallengePartialTable");
-                    } *@
+                </tbody> *@
+                    @{
+                        await Html.RenderPartialAsync("_PersonalChallengePartialTable", Model.Item1);
+                    }
             </table>
         </center>
 
