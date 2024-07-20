@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using RunBot2024.DbContexts;
 using RunWebPage2024.Models;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RunWebPage2024.Controllers
 {
@@ -52,34 +53,37 @@ namespace RunWebPage2024.Controllers
 
             _rivalsFilteredCollection = _rivalsFullCollection;
             compositeModel = new Tuple<List<RivalModel>, string, string>(_rivalsFullCollection, company, gender);
+
             return View(compositeModel);
         }
 
         [HttpPost]
         public IActionResult OnCompanySelect(string gender)
         {
-
             if (gender != "all")
             {
-                _rivalsFilteredCollection = new List<RivalModel> ( _rivalsFullCollection.Where(x => x.Gender == gender[0]).ToList() );
+                _rivalsFilteredCollection = new List<RivalModel>(_rivalsFullCollection.Where(x => x.Gender == gender[0]).ToList());
             }
             else
             {
+                gender = "all";
                 _rivalsFilteredCollection = _rivalsFullCollection;
             }
 
-            return PartialView("_PersonalChallengePartialTable", _rivalsFilteredCollection);
+            Tuple<List<RivalModel>, string> compositeModel = new Tuple<List<RivalModel>, string>(_rivalsFilteredCollection, gender);
+
+            return PartialView("_PersonalChallengePartialTable", compositeModel);
         }
 
-        //public IActionResult Privacy()
-        //{
-        //    return View();
-        //}
+        public IActionResult Privacy()
+        {
+            return View();
+        }
 
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }

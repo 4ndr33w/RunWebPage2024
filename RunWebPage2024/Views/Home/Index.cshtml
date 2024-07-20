@@ -17,55 +17,44 @@
 {
     @Html.AntiForgeryToken()
     <center>
-
     <p></p>
-    @Html.DropDownList( "RivalGender", genderList, new { id = "genderDropDown", CssClass = "dropDownList" } )
+    @Html.DropDownList("RivalGender", genderList, new { id = "genderDropDown", CssClass = "dropDownList"})
     <p></p>
-
     <hr>
-
     <div id="rivalTable">
         <center>
-            <table>
-                <thead>
-                    <tr>
-                        <th align="center">Позиция</th>
-                            <th align="center">Имя участника</th>
-                            <th align="center">Результат, км</th>
-                            <th align="center">Предприятие</th>
-@*                             <th align="center">Город</th> *@
-                            <th align="center">Пол</th>
-                    </tr>
-                </thead>
-
-@*                 <tbody>
-                        @{
-                            int position = 0;
-                            foreach(var rival in Model.Item1)
-                            {
-                                position++;
-                                <tr>
-                                    <td id="@position" align="center">@position</td>
-                                    <td align="center">@rival.Name</td>
-                                    <td align="center">@rival.TotalResult</td>
-                                    <td align="center">@rival.Company</td>
-                                    <td align="center">@rival.Gender</td>
-                                </tr>
-                            }
-                        }
-                </tbody> *@
                     @{
-                        await Html.RenderPartialAsync("_PersonalChallengePartialTable", Model.Item1);
+                        var tuple = new Tuple<List<RivalModel>, string>(Model.Item1.ToList(), Model.Item3);
+                        await Html.RenderPartialAsync("_PersonalChallengePartialTable", tuple);
                     }
-            </table>
         </center>
-
     </div>
-
     </center>
 }
 
-@* <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div> *@
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('select').on('change', function () {
+                var _gender = document.getElementById('genderDropDown').value;
+       @{
+            var tuple = new Tuple<List<RivalModel>, string>(Model.Item1, Model.Item3);
+        }
+                const table = document.getElementById('rivalTable');
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("OnCompanySelect", "Home", tuple)',
+                    data: { gender: _gender },
+                    success:
+                        function (response) {
+                            $('#personalResultPartialTable').remove();
+                            $('#personalResultPartialTable').append(response);
+                            table.innerHTML = response;
+                        }
+                });
+            });
+        });
+    </script>
+    
+}
+
