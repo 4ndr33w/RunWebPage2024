@@ -2,7 +2,70 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
+@model Tuple<List<RivalModel>, string, string>
+
+@{
+    List<SelectListItem> genderList = new List<SelectListItem>
+    {
+        new SelectListItem("Все участники", "all", true),
+        new SelectListItem("Мужчины", "male"),
+        new SelectListItem("Женщины", "female")
+    };
+    }
+
+    @using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <center>
+
+    <p></p>
+    @Html.DropDownList( "RivalGender", genderList, new { id = "genderDropDown", CssClass = "dropDownList" } )
+    <p></p>
+
+    <hr>
+
+    <div id="rivalTable">
+        <center>
+            <table>
+                <thead>
+                    <tr>
+                        <th align="center">Позиция</th>
+                            <th align="center">Имя участника</th>
+                            <th align="center">Результат, км</th>
+                            <th align="center">Предприятие</th>
+@*                             <th align="center">Город</th> *@
+                            <th align="center">Пол</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                        @{
+                            int position = 0;
+                            foreach(var rival in Model.Item1)
+                            {
+                                position++;
+                                <tr>
+                                    <td id="@position" align="center">@position</td>
+                                    <td align="center">@rival.Name</td>
+                                    <td align="center">@rival.TotalResult</td>
+                                    <td align="center">@rival.Company</td>
+                                    <td align="center">@rival.Gender</td>
+                                </tr>
+                            }
+                        }
+                </tbody>
+@*                     @{
+                        await Html.RenderPartialAsync("_PersonalChallengePartialTable");
+                    } *@
+            </table>
+        </center>
+
+    </div>
+
+    </center>
+}
+
+@* <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+</div> *@
