@@ -48,18 +48,13 @@ namespace RunWebPage2024.Controllers
 
                             where Company.CityId.Equals(City.Id)
                             where RegionCollection.Id.Equals(City.RegionId)
-                            select new
+                            select new FullCompanyList
                             {
                                 CompanyName = Company.Name,
                                 CityName = City.Name,
                                 RegionName = RegionCollection.Name
                             };
-                query = query.OrderBy(x => x.CityName).ToList();
-
-                foreach (var item in query)
-                {
-                    tempCollection.Add(new FullCompanyList { CompanyName = item.CompanyName, CityName = item.CityName, RegionName = item.RegionName });
-                }
+                tempCollection = query.OrderBy(x => x.CityName).ToList();
             }
             catch (Exception)
             { // Если соединение с БД не удалось, то просто возвращяем пустую коллекцию tempCollection
@@ -91,26 +86,14 @@ namespace RunWebPage2024.Controllers
                 var query = from RivalCollection in _pgContext.Rivals.AsEnumerable()
                             group RivalCollection by RivalCollection.Company into test
 
-                            select new
+                            select new CompanyStatisticModel
                             {
                                 CompanyName = test.Key,
                                 Result = test.Sum(x => x.TotalResult),
                                 RivalsCount = test.Count(),
                                 AverageResult = test.Sum(x => x.TotalResult) / test.Count()
                             };
-
-                foreach (var item in query)
-                {
-                    tempCollection.Add(
-                        new CompanyStatisticModel
-                        {
-                            CompanyName = item.CompanyName,
-                            Result = item.Result,
-                            AverageResult = item.AverageResult,
-                            RivalsCount = item.RivalsCount,
-                        });
-                }
-                tempCollection = tempCollection.OrderByDescending(x => x.Result).ToList();
+                tempCollection = query.OrderByDescending(x => x.Result).ToList();
             }
             catch (Exception)
             {
