@@ -71,8 +71,6 @@
                     data: { gender: _gender, company: _company },
                     success:
                         function (response) {
-                            $('#personalResultPartialTable').remove();
-                            $('#personalResultPartialTable').append(response);
                             table.innerHTML = response;
                         }
                 });
