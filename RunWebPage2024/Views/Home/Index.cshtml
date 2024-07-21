@@ -2,29 +2,52 @@
     ViewData["Title"] = "Home Page";
 }
 
-@model Tuple<List<RivalModel>, string, string>
+@model Tuple<List<FullCompanyList>, List<RivalModel>, string, string>
 
 @{
-    List<SelectListItem> genderList = new List<SelectListItem>
+    List<SelectListItem> genderCollection = new List<SelectListItem>
     {
         new SelectListItem("Все участники", "all", true),
         new SelectListItem("Мужчины", "male"),
         new SelectListItem("Женщины", "female")
     };
+}
+
+@{
+    List<SelectListItem> companyCollection = new List<SelectListItem>();
+    companyCollection.Add(new SelectListItem("Все предприятия", "all", true));
+
+    int position = 0;
+    foreach (var companyModel in Model.Item1)
+    {
+        position++;
+        string variativeSpace = "";
+
+
+        if (position < 10)
+        {
+            variativeSpace = "0";
+        }
+        var companyDropDownString = $"{variativeSpace}{position} - {companyModel.CityName} - {companyModel.CompanyName}";
+
+        companyCollection.Add(new SelectListItem(companyDropDownString, $"{companyModel.CompanyName}"));
     }
+}
 
     @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     <center>
     <p></p>
-    @Html.DropDownList("RivalGender", genderList, new { id = "genderDropDown", CssClass = "dropDownList"})
+    @Html.DropDownList("RivalCompany", companyCollection, new { id = "companyDropDown", CssClass = "dropDownList"})
+    <p></p>
+        @Html.DropDownList("RivalGender", genderCollection, new { id = "genderDropDown", CssClass = "dropDownList"})
     <p></p>
     <hr>
     <div id="rivalTable">
         <center>
                     @{
-                        var tuple = new Tuple<List<RivalModel>, string>(Model.Item1.ToList(), Model.Item3);
+                        var tuple = new Tuple<List<RivalModel>, string>(Model.Item2.ToList(), Model.Item4);
                         await Html.RenderPartialAsync("_PersonalChallengePartialTable", tuple);
                     }
         </center>
@@ -37,14 +60,15 @@
         $(document).ready(function () {
             $('select').on('change', function () {
                 var _gender = document.getElementById('genderDropDown').value;
+                var _company = document.getElementById('companyDropDown').value;
        @{
-            var tuple = new Tuple<List<RivalModel>, string>(Model.Item1, Model.Item3);
+            var tuple = new Tuple<List<RivalModel>, string>(Model.Item2, Model.Item3);
         }
                 const table = document.getElementById('rivalTable');
                 $.ajax({
                     type: "POST",
                     url: '@Url.Action("OnCompanySelect", "Home", tuple)',
-                    data: { gender: _gender },
+                    data: { gender: _gender, company: _company },
                     success:
                         function (response) {
                             $('#personalResultPartialTable').remove();
