@@ -167,7 +167,7 @@ namespace RunWebPage2024.Controllers
             return _rivalsFilteredCollection;
         }
 
-        public IActionResult Privacy()
+        public IActionResult CompanyStatistic()
         {
             List<CompanyStatisticModel> companyStatisticsCollection = new List<CompanyStatisticModel>();
 
