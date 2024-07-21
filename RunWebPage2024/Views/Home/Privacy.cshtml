@@ -1,6 +1,37 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Статистика по предприятиям";
 }
-<h1>@ViewData["Title"]</h1>
+<h2>@ViewData["Title"]</h2>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@model List<CompanyStatisticModel>
+
+<hr />
+<table>
+    <thead>
+        <tr>
+            <th align="center">Позиция</th>
+            <th align="center">Предприятие</th>
+            <th align="center">Средний результат, км</th>
+            <th align="center">Общий результат, км</th>
+            <th align="center">Участники</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int position = 0;
+
+            foreach (var company in Model)
+            {
+                position++;
+
+                <tr>
+                    <td id="@position" align="center">@position</td>
+                    <td id="@company.CompanyName" align="center">@company.CompanyName</td>
+                    <td id="@company.AverageResult" align="center">@company.AverageResult</td>
+                    <td id="@company.Result" align="center">@company.Result</td>
+                    <td id="@company.RivalsCount" align="center">@company.RivalsCount</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

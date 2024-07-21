@@ -169,7 +169,11 @@ namespace RunWebPage2024.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            List<CompanyStatisticModel> companyStatisticsCollection = new List<CompanyStatisticModel>();
+
+            companyStatisticsCollection = _companyChampionshipCollection;
+
+            return View(companyStatisticsCollection);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
