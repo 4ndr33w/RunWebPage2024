@@ -18,6 +18,8 @@ namespace RunWebPage2024.Controllers
         private List<RivalModel> _rivalsFullCollection;
 
         private List<FullCompanyList> _fullCompanyList;
+
+        private List<CompanyStatisticModel> _companyChampionshipCollection;
         
 
         public HomeController(ILogger<HomeController> logger, IConfiguration configuration, NpgDbContext npgDbContext)
@@ -31,13 +33,15 @@ namespace RunWebPage2024.Controllers
 
         private void Initialize()
         {
+            _rivalsFullCollection = GetRivalCollection();
+            _fullCompanyList = GetCompanyCollection();
+            _companyChampionshipCollection = GetCompanyStatisticCollection();
+        }
+        private List<FullCompanyList> GetCompanyCollection()
+        {
+            var tempCollection = new List<FullCompanyList>();
             try
             {
-                _rivalsFullCollection = _pgContext.Rivals
-                    .Where(x => x.TotalResult > 0)
-                    .OrderByDescending(x => x.TotalResult)
-                    .ToList();
-
                 var query = from Company in _pgContext.Companies.AsEnumerable()
                             from City in _pgContext.Cities.AsEnumerable()
                             from RegionCollection in _pgContext.Regions.AsEnumerable()
@@ -52,17 +56,67 @@ namespace RunWebPage2024.Controllers
                             };
                 query = query.OrderBy(x => x.CityName).ToList();
 
-                _fullCompanyList = new List<FullCompanyList>();
                 foreach (var item in query)
                 {
-                    _fullCompanyList.Add(new FullCompanyList { CompanyName = item.CompanyName, CityName = item.CityName, RegionName = item.RegionName});
+                    tempCollection.Add(new FullCompanyList { CompanyName = item.CompanyName, CityName = item.CityName, RegionName = item.RegionName });
                 }
             }
             catch (Exception)
+            { // Если соединение с БД не удалось, то просто возвращяем пустую коллекцию tempCollection
+            } // Сформированую над блоком try
+
+            return tempCollection;
+        }
+        private List<RivalModel> GetRivalCollection()
+        {
+            var tempCollection = new List<RivalModel>();
+            try
             {
-                _rivalsFullCollection = new List<RivalModel>();
-                _fullCompanyList = new List<FullCompanyList>();
+                tempCollection = _pgContext.Rivals
+                    .Where(x => x.TotalResult > 0)
+                    .OrderByDescending(x => x.TotalResult)
+                    .ToList();
             }
+            catch (Exception)
+            { // Если соединение с БД не удалось, то просто возвращяем пустую коллекцию tempCollection
+            } // Сформированую над блоком try
+            return tempCollection;
+        }
+        private List<CompanyStatisticModel> GetCompanyStatisticCollection()
+        {
+            List<CompanyStatisticModel> tempCollection = new List<CompanyStatisticModel>();
+
+            try
+            {
+                var query = from RivalCollection in _pgContext.Rivals.AsEnumerable()
+                            group RivalCollection by RivalCollection.Company into test
+
+                            select new
+                            {
+                                CompanyName = test.Key,
+                                Result = test.Sum(x => x.TotalResult),
+                                RivalsCount = test.Count(),
+                                AverageResult = test.Sum(x => x.TotalResult) / test.Count()
+                            };
+
+                foreach (var item in query)
+                {
+                    tempCollection.Add(
+                        new CompanyStatisticModel
+                        {
+                            CompanyName = item.CompanyName,
+                            Result = item.Result,
+                            AverageResult = item.AverageResult,
+                            RivalsCount = item.RivalsCount,
+                        });
+                }
+                tempCollection = tempCollection.OrderByDescending(x => x.Result).ToList();
+            }
+            catch (Exception)
+            {
+            }
+
+            return tempCollection;
         }
 
         public IActionResult Index()
@@ -89,6 +143,15 @@ namespace RunWebPage2024.Controllers
             Tuple<List<RivalModel>, string> compositeModel = new Tuple<List<RivalModel>, string>(_rivalsFilteredCollection, gender);
 
             return PartialView("_PersonalChallengePartialTable", compositeModel);
+        }
+
+        public IActionResult CompanyChampionship()
+        {
+            List<CompanyStatisticModel> companyStatisticsCollection = new List<CompanyStatisticModel>();
+
+            companyStatisticsCollection = _companyChampionshipCollection;
+
+            return View("CompanyChampionship", companyStatisticsCollection);
         }
 
         private List<RivalModel> CollectionFilteringByCompany(string company)
