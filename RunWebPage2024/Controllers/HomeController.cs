@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using RunBot2024.DbContexts;
 using RunWebPage2024.Models;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RunWebPage2024.Controllers
@@ -40,6 +42,10 @@ namespace RunWebPage2024.Controllers
         private List<FullCompanyList> GetCompanyCollection()
         {
             var tempCollection = new List<FullCompanyList>();
+            //пришлось ввести вторую коллекцию, в которую фильтруются результаты из первой
+            //так как при фильтрации результатов в коллекцию напрямую из запроса - 
+            //предприятия повторялись.
+            var filteredCollection = new List<FullCompanyList>();
             try
             {
                 var query = from Company in _pgContext.Companies.AsEnumerable()
@@ -48,6 +54,7 @@ namespace RunWebPage2024.Controllers
 
                             where Company.CityId.Equals(City.Id)
                             where RegionCollection.Id.Equals(City.RegionId)
+                            //orderby City.Name
                             select new FullCompanyList
                             {
                                 CompanyName = Company.Name,
@@ -55,12 +62,23 @@ namespace RunWebPage2024.Controllers
                                 RegionName = RegionCollection.Name
                             };
                 tempCollection = query.OrderBy(x => x.CityName).ToList();
+
+                foreach (var rival in _rivalsFullCollection)
+                {
+                    foreach (var company in tempCollection)
+                    {
+                        if (company.CompanyName == rival.Company && !filteredCollection.Contains(company))
+                        {
+                            filteredCollection.Add(company);
+                        }
+                    }
+                }
             }
             catch (Exception)
-            { // Если соединение с БД не удалось, то просто возвращяем пустую коллекцию tempCollection
+            { // Если соединение с БД не удалось, то просто возвращяем пустую коллекцию filteredCollection
             } // Сформированую над блоком try
 
-            return tempCollection;
+            return filteredCollection;
         }
         private List<RivalModel> GetRivalCollection()
         {
@@ -85,7 +103,7 @@ namespace RunWebPage2024.Controllers
             {
                 var query = from RivalCollection in _pgContext.Rivals.AsEnumerable()
                             group RivalCollection by RivalCollection.Company into test
-
+                            
                             select new CompanyStatisticModel
                             {
                                 CompanyName = test.Key,
