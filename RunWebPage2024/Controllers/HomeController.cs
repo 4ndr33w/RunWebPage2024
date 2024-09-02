@@ -1,12 +1,8 @@
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 using RunBot2024.DbContexts;
 using RunWebPage2024.Models;
 using System.Diagnostics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RunWebPage2024.Controllers
 {
@@ -54,7 +50,7 @@ namespace RunWebPage2024.Controllers
 
                             where Company.CityId.Equals(City.Id)
                             where RegionCollection.Id.Equals(City.RegionId)
-                            //orderby City.Name
+
                             select new FullCompanyList
                             {
                                 CompanyName = Company.Name,
@@ -181,6 +177,12 @@ namespace RunWebPage2024.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult OldResults()
+        {
+            ViewData["Title"] = _configuration["OldResultsTitle"];
+            return View();
         }
     }
 }

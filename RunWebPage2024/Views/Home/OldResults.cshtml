@@ -1,0 +1,40 @@
+﻿<center>
+    <h4>Результаты марафона</h4>
+    <h4>@ViewData["Title"]</h4>
+
+    <hr />
+
+    <table>
+        <thead>
+            <tr>
+                <th align="center">Свободный стиль</th>
+                <th align="center">Классический стиль</th>
+                <th align="center">Абсолютный зачет</th>
+            </tr>
+        </thead>
+        <tbody id="userTable">
+            @{
+                <tr>
+                    <td id="ManFreeStyle" align="center"><a href="~/oldresults/MenFreeStyle2021.pdf">Мужчины своб.</a> </td>
+                    <td id="ManClassicStyle" align="center"><a href="~/oldresults/MenClassicStyle2021.pdf">Мужчины классич.</a></td>
+                    <td id="ManTotal" align="center"><a href="~/oldresults/MenTotal2021.pdf">Мужчины абс.</a></td>
+                </tr>
+                <tr>
+                    <td id="WomanFreeStyle" align="center"><a href="~/oldresults/WomanFreeStyle2021.pdf">Женщины своб.</a> </td>
+                    <td id="WomanClassicStyle" align="center"> </td>
+                    <td id="WomanTotal" align="center"><a href="~/oldresults/WomanTotal2021.pdf">Женщины абс.</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p></p>
+    <hr />
+    <p></p>
+    <table>
+        <thead>
+            <tr>
+                <th align="center"><a href="~/oldresults/Group2021.pdf">Командное первенство</a></th>
+            </tr>
+        </thead>
+    </table>
+</center>
